@@ -1,5 +1,7 @@
 
-MODULE_NAME=hello_world
+file=$1
+
+MODULE_NAME=$(file)
 obj-m := ${MODULE_NAME}.o
 
 all:
