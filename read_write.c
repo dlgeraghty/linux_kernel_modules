@@ -9,8 +9,16 @@ MODULE_LICENSE("GPL");
 
 static struct proc_dir_entry *proc_entry;
 
-
 static ssize_t my_custom_read(struct file *filp, char __user *buf, size_t len, loff_t *off) {
+	int nr_bytes;
+	char * str;
+	str = vmalloc((size_t) len);
+	strcat(str , "ola amigos\0");
+	if(copy_to_user(str, buf, 5))
+		return -EFAULT;
+
+	*off += len;
+	return len;
 
 }
 
@@ -39,7 +47,7 @@ static const struct proc_ops proc_entry_fops = {
 
 int my_custom_init(void){
 	int ret = 0;
-	proc_entry = proc_create( "modlist", 0666, NULL, &proc_entry_fops);
+	proc_entry = proc_create( "rwtest", 0666, NULL, &proc_entry_fops);
 
 	if(proc_entry == NULL){
 		ret = -ENOMEM;
