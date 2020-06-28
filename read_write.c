@@ -13,10 +13,15 @@ static ssize_t my_custom_read(struct file *filp, char __user *buf, size_t len, l
 	int nr_bytes;
 	char * str;
 	str = vmalloc((size_t) len);
-	strcat(str , "ola amigos\0");
-	if(copy_to_user(str, buf, 5))
+	sprintf(str, "%s", "ola ola");
+	if(copy_to_user(str, buf, len)){
+		vfree(str);
 		return -EFAULT;
+	}
 
+	str[len] = '\0';
+
+	vfree(str);
 	*off += len;
 	return len;
 
