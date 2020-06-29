@@ -3,6 +3,7 @@
 #include <linux/module.h>
 #include <linux/proc_fs.h>
 #include <linux/vmalloc.h>
+#include <linux/tty.h>
 #include <linux/fs.h>
 
 MODULE_LICENSE("GPL");
@@ -10,18 +11,18 @@ MODULE_LICENSE("GPL");
 static struct proc_dir_entry *proc_entry;
 
 static ssize_t my_custom_read(struct file *filp, char __user *buf, size_t len, loff_t *off) {
-	int nr_bytes;
-	char * str;
-	str = vmalloc((size_t) len);
-	sprintf(str, "%s", "ola ola");
-	if(copy_to_user(str, buf, len)){
-		vfree(str);
-		return -EFAULT;
-	}
+	struct tty_struct *tty;
 
-	str[len] = '\0';
+	//https://stackoverflow.com/questions/20719713/how-can-i-write-to-tty-from-a-kernel-module
 
-	vfree(str);
+	tty = get_current_tty();
+
+	if(tty != NULL)
+
+		(tty->driver->ops->write) (tty, "ola", strlen("ola"));
+	else
+		printk("bad tty");
+
 	*off += len;
 	return len;
 
