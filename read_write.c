@@ -13,13 +13,16 @@ static struct proc_dir_entry *proc_entry;
 static ssize_t my_custom_read(struct file *filp, char __user *buf, size_t len, loff_t *off) {
 	struct tty_struct *tty;
 
+	if(*off > 0)
+		return 0;
+
 	//https://stackoverflow.com/questions/20719713/how-can-i-write-to-tty-from-a-kernel-module
 
 	tty = get_current_tty();
 
 	if(tty != NULL)
 
-		(tty->driver->ops->write) (tty, "ola", strlen("ola"));
+		(tty->driver->ops->write) (tty, "hello", strlen("hello"));
 	else
 		printk("bad tty");
 
